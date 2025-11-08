@@ -91,7 +91,7 @@ def llm_invoke_with_fallback(prompt: str, temperature: float = 0.2) -> str:
         return f"GenerationError: {type(e).__name__}: {e}"
 
 # ------------- Strict RAG answer -------------
-def answer_from_transcript(question: str):
+def answer_from_transcript(question: str, show_chunks: bool = False):
     # Retrieve chunks (no threshold initially; we hard-refuse if none)
     try:
         docs = vectorstore.similarity_search(question, k=K)
@@ -118,19 +118,27 @@ def answer_from_transcript(question: str):
         return {"error": content}, 500
 
     if (not content.strip()) or (REFUSAL in content):
-        return {"answer": REFUSAL, "context": ""}, 200
+        return {"answer": REFUSAL}, 200
 
-    return {"answer": content.strip(), "context": context}, 200
+
+    result = {"answer": content.strip()}
+    if show_chunks:
+     	result["context"] = context
+    return result, 200
 
 # ------------- Routes -------------
 @app.route("/api/chat", methods=["POST"])
 def chat():
     data = request.get_json(silent=True) or {}
     question = data.get("question", "").strip()
+    show_chunks = data.get("show_chunks", False)
+
     if not question:
         return jsonify({"error": "Missing question"}), 400
-    payload, status = answer_from_transcript(question)
+
+    payload, status = answer_from_transcript(question, show_chunks=show_chunks)
     return jsonify(payload), status
+
 
 @app.route("/api/generate-questions", methods=["POST"])
 def generate_questions():
