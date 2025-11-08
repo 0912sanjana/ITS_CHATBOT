@@ -1,4 +1,4 @@
-Dhamm AI ITS Chatbot
+# 🧠 Dhamm AI ITS Chatbot
 
 ### Conversational RAG Assistant for Knowledge-Driven Learning
 
@@ -120,6 +120,7 @@ python3 app.py
 ### Access
 
 Visit → [http://localhost:8000](http://localhost:8000)
+
 Health check:
 
 ```bash
@@ -155,8 +156,28 @@ Returns:
 }
 ```
 
-> Out-of-scope questions get:
-> `{ "answer": "Sorry, this question is outside the scope of the provided transcript." }`
+> 🧩 **Important JSON Syntax Note:** When testing with curl, always use lowercase `true` and `false` in JSON — Python-style `True` / `False` will break parsing.
+>
+> Example:
+>
+> ```bash
+> curl -X POST http://localhost:8000/api/chat \
+>   -H "Content-Type: application/json" \
+>   -d '{
+>     "question": "Which schedule of the Indian Constitution mentions powers of Panchayats?",
+>     "show_chunks": true
+>   }'
+> ```
+>
+> ✅ Works fine.
+>
+> ❌ This will fail:
+>
+> ```bash
+> "show_chunks": True
+> ```
+
+> Out-of-scope questions get: `{ "answer": "Sorry, this question is outside the scope of the provided transcript." }`
 
 ### 3. Generate Questions
 
