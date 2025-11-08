@@ -1,4 +1,4 @@
-# 🧠 Dhamm AI ITS Chatbot
+#  Dhamm AI ITS Chatbot
 
 ### Conversational RAG Assistant for Knowledge-Driven Learning
 
@@ -7,7 +7,7 @@ It is designed to deliver **context-aware answers** strictly from your uploaded 
 
 ---
 
-## 🚀 Overview
+##  Overview
 
 This chatbot combines **semantic retrieval**, **strict context control**, and **multi-model inference** (Gemini + Groq fallback) to power real-time, adaptive tutoring and domain-specific Q&A.
 
@@ -22,7 +22,7 @@ This chatbot combines **semantic retrieval**, **strict context control**, and **
 
 ---
 
-## ✨ Key Highlights (2025 Update)
+##  Key Highlights (2025 Update)
 
 | Category                     | Improvements                                                                                |
 | ---------------------------- | ------------------------------------------------------------------------------------------- |
