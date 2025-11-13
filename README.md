@@ -1,201 +1,288 @@
-🚀 Dhamm AI ITS Chatbot
-Conversational RAG Assistant for Knowledge-Driven Learning
+#  Dhamm AI ITS Chatbot
 
-The Dhamm AI ITS Chatbot is an intelligent, retrieval-augmented conversational tutor built using LangChain, Google Gemini, and Groq LLaMA 3.3.
-It provides strict, transcript-driven answers, ensuring high precision, explainability, and Bloom’s Taxonomy–aligned reasoning.
+### Conversational RAG Assistant for Knowledge-Driven Learning
 
-📘 Overview
+Dhamm AI Chatbot is an intelligent, retrieval-augmented chat application built on **LangChain**, **Google Gemini**, and **Groq Llama 3.3**.
+It is designed to deliver **context-aware answers** strictly from your uploaded transcript — ensuring precision, transparency, and explainability — with **Bloom’s Taxonomy**-aligned reasoning.
 
-This chatbot integrates:
-Semantic retrieval (Chroma Vector DB)
-Strict context enforcement
-Dual-LLM inference (Gemini + Groq failover)
-A modular Flask backend
-Adaptive and domain-specific Q&A for ITS systems
+---
 
-🧱 Core Tech Stack
-Component	Technology
-Embeddings	Google Generative AI (models/text-embedding-004)
-Primary LLM	Gemini 2.5 Pro
-Fallback LLM	Groq Llama 3.3-70B Versatile
-Backend	Flask
-Vector Store	ChromaDB
-Retrieval	LangChain Community
-Orchestration	LangChain-Chroma
-Environment	.env (API keys ignored via .gitignore)
+##  Overview
 
-🟧 Key Highlights (2025 Update)
-Category	Improvements
-🔄 Dual Model	Gemini primary + Groq fallback (auto failover on quota/429)
-📚 Strict Transcript Context	Answers ONLY from cleaned_transcript.txt; out-of-scope → polite refusal
-🧠 Vector DB	Rebuilt vectordb.py with safe chunking + improved embeddings
-⚙️ Error Handling	Clear JSON responses, handled exceptions
-💾 Environment Safety	.env securely ignored
-🧩 Modular Design	Separate vector builder + API router
-🤯 RAG Pipeline	Better chunking, retrieval consistency
-🌐 Cross-Platform	Works on Windows, macOS, Linux & Azure
+This chatbot combines **semantic retrieval**, **strict context control**, and **multi-model inference** (Gemini + Groq fallback) to power real-time, adaptive tutoring and domain-specific Q&A.
 
+**Core stack:**
 
-🧩 Architecture Overview
-Transcript (cleaned_transcript.txt)
-          │
-          ▼
-RecursiveCharacterTextSplitter (Chunking)
-          │
-          ▼
-Google Embeddings (text-embedding-004)
-          │
-          ▼
-Chroma Vector Store (vectordb/)
-          │
-          ▼
-Retriever (Top-K = 4)
-          │
-          ▼
-LLM Layer:
-   - Gemini 2.5 Pro (primary)
-   - Groq LLaMA 3.3-70B (fallback)
-          │
-          ▼
-Flask API Response (/api/chat)
+* **LangChain Community + LangChain-Chroma**
+* **Google Generative AI Embeddings**
+* **Gemini 2.5 Pro** (primary LLM)
+* **Groq Llama 3.3-70B Versatile** (automatic fallback)
+* **Flask API Backend**
+* **Chroma Vector Database**
 
+---
 
-⚒️ Setup Guide
-1️⃣ Clone the Repository
-git clone https://github.com/0912sanjana/ITS_CHATBOT.git
-cd ITS_CHATBOT
+##  Key Highlights (2025 Update)
 
-2️⃣ Create Virtual Environment
-python -m venv venv
-source venv/bin/activate   # Windows: venv\Scripts\activate
+| Category                     | Improvements                                                                                |
+| ---------------------------- | ------------------------------------------------------------------------------------------- |
+| 🔄 Dual Model                | Gemini (primary) + Groq (fallback) with automatic fail-over on quota/429 errors             |
+| 📚 Strict Transcript Context | Chatbot answers only from `cleaned_transcript.txt`; out-of-scope queries politely refused   |
+| 🧠 Vector DB                 | Rebuilt `vectordb.py` with safe rebuild, better chunking, and explicit Google embedding key |
+| ⚙️ Error Handling            | Graceful exceptions + clear JSON messages                                                   |
+| 💾 Environment Safety        | `.env` excluded via `.gitignore`; secure key handling validated                             |
+| 🌐 Portability               | Works on macOS, Linux, and Azure App Service                                                |
+| 🧩 Modular Design            | Separate vector builder (`vectordb.py`) + Flask API (`app.py`)                              |
+| 🤯 RAG Pipeline              | Improved retrieval thresholds and chunk context resolution                                  |
 
-3️⃣ Install Dependencies
+---
+
+## 🧩 Architecture Overview
+
+1. **Transcript → Chunks** → via `RecursiveCharacterTextSplitter`
+2. **Chunks → Embeddings** → Google `models/text-embedding-004`
+3. **Chroma Vector Store** → stored locally in `vectordb/`
+4. **RAG Chain** → retrieves top-K context per query
+5. **Gemini LLM → Groq Fallback** → contextual response generation
+6. **Flask API** → serves REST endpoints for chat and question generation
+
+---
+
+## 🧮 Setup Guide
+
+### 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/dibyacharyaAI/ITS_chatbot.git
+cd ITS_chatbot
+```
+
+### 2️⃣ Create Virtual Environment
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3️⃣ Install Dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-🔐 Environment Variables
+### 4️⃣ Configure Environment Variables
 
-Create a .env file:
+Create a `.env` file in the project root:
 
+```
 GOOGLE_API_KEY=your_google_api_key_here
 GROQ_API_KEY=your_groq_api_key_here
+```
 
+> 🛡️ **Do NOT commit `.env`** — it’s ignored via `.gitignore`.
 
-⚠️ Never commit .env → It is correctly ignored using .gitignore.
+---
 
-🧠 Build Vector Database
+## 🧠 Initialize Vector Database
 
 Before running the chatbot:
-python vectordb.py
+
+```bash
+python3 vectordb.py
+```
 
 This will:
-Load cleaned_transcript.txt
-Split text into chunks
-Create embeddings
-Save vector DB into vectordb/
+
+* Load `cleaned_transcript.txt`
+* Split into semantic chunks
+* Generate embeddings (Google)
+* Persist to `vectordb/`
 
 Expected output:
 
+```
 ✅ VectorDB built and persisted.
-📦 Documents indexed: 1
-🔢 Chroma internal count: 120
+📦 Documents indexed: 1 | Chunks indexed: 13
+🔢 Chroma internal count: 13
+```
 
-🗣️ Run the Chatbot Server
-python app.py
+---
 
+## 🗣️ Run the Chatbot
 
-Access UI/API at:
-👉 http://localhost:8000
+### Development Mode
 
-⚙️ API Endpoints
-1. Health Check
+```bash
+source venv/bin/activate
+python3 app.py
+```
 
-GET /
+### Access
 
-Response:
+Visit → [http://localhost:8000](http://localhost:8000)
 
+Health check:
+
+```bash
+curl http://localhost:8000/
+```
+
+---
+
+## ⚙️ API Endpoints
+
+### 1. Health Check
+
+**GET** `/`
+
+```json
+{ "status": "ok", "message": "Dhamm AI backend is running." }
+```
+
+### 2. Chat
+
+**POST** `/api/chat`
+
+```json
+{ "question": "Which schedule of the Indian Constitution mentions powers of Panchayats?" }
+```
+
+Returns:
+
+```json
 {
-  "status": "ok",
-  "message": "Dhamm AI backend is running."
+  "answer": "The Eleventh Schedule of the Constitution lists the powers of Panchayats.",
+  "context": "..."
 }
+```
 
-2. Chat Endpoint
+> 🧩 **Important JSON Syntax Note:** When testing with curl, always use lowercase `true` and `false` in JSON — Python-style `True` / `False` will break parsing.
+>
+> Example:
+>
+> ```bash
+> curl -X POST http://localhost:8000/api/chat \
+>   -H "Content-Type: application/json" \
+>   -d '{
+>     "question": "Which schedule of the Indian Constitution mentions powers of Panchayats?",
+>     "show_chunks": true
+>   }'
+> ```
+>
+> ✅ Works fine.
+>
+> ❌ This will fail:
+>
+> ```bash
+> "show_chunks": True
+> ```
 
-POST /api/chat
+> Out-of-scope questions get: `{ "answer": "Sorry, this question is outside the scope of the provided transcript." }`
 
-Example:
+### 3. Generate Questions
 
-curl -X POST http://localhost:8000/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"question":"Explain the DKT model"}'
+**POST** `/api/generate-questions`
 
-
-Response:
-
+```json
 {
-  "answer": "Here is the answer strictly from transcript..."
-}
-
-
-Out-of-scope example:
-
-{
-  "answer": "Sorry, this question is outside the scope of the provided transcript."
-}
-
-3. Question Generator
-
-POST /api/generate-questions
-
-{
-  "course_outcome": "Understand AI models",
+  "course_outcome": "Understand soil mechanics",
   "bloom_level": "apply"
 }
+```
 
+* Uses Groq by default → Gemini fallback
 
-Uses Groq → fallback Gemini.
+---
 
-📂 Vector Store Structure
-File	Description
-cleaned_transcript.txt	RAG data source
-vectordb/	Chroma embeddings
-vectordb.py	Vector DB builder
+## 🧩 Vector Store Structure
 
-☁️ Deployment Options
-▶ Gunicorn
+| File                     | Description                       |
+| ------------------------ | --------------------------------- |
+| `cleaned_transcript.txt` | Raw source text for embedding     |
+| `vectordb/`              | Persisted Chroma collection       |
+| `vectordb.py`            | Script to build/rebuild the index |
+
+---
+
+## 🧱 Deployment Options
+
+### ▶ Gunicorn (Local/Server)
+
+```bash
 gunicorn app:app --bind 0.0.0.0:8000 --workers 4 --worker-class gevent --timeout 120
+```
 
-▶ Azure App Service
-Upload project folder
-Configure GOOGLE_API_KEY and GROQ_API_KEY in App Settings
-Enable CORS
-Use startup command: gunicorn app:app
+### ▶ Azure App Service
 
-🧪 Testing
-In-scope:
+* Upload project directory
+* Configure App Settings:
+
+  * `FLASK_ENV=production`
+  * `GOOGLE_API_KEY` & `GROQ_API_KEY`
+* Enable CORS for frontend domain
+
+### ▶ React Frontend (Optional)
+
+Connect via `axios` to `/api/chat` (see frontend section in original documentation).
+
+---
+
+## 🧩 Configuration Parameters
+
+| Key               | Description               | Default                                 |
+| ----------------- | ------------------------- | --------------------------------------- |
+| `EMBEDDING_MODEL` | Google embedding model    | `"models/text-embedding-004"`           |
+| `VECTORDB_DIR`    | Vector database directory | `"vectordb"`                            |
+| `COLLECTION_NAME` | Chroma collection name    | `"chroma"`                              |
+| `K`               | Top-K retrieval chunks    | 4                                       |
+| `PRIMARY_GEMINI`  | Gemini model              | `"gemini-2.5-pro"` / `gemini-1.5-flash` |
+
+---
+
+## 🧪 Testing
+
+```bash
+# Chat (in-scope)
 curl -X POST http://localhost:8000/api/chat \
   -H "Content-Type: application/json" \
-  -d '{"question":"What is Hybrid KG-RAG?"}'
+  -d '{"question":"Which schedule of the Indian Constitution mentions powers of Panchayats?"}'
 
-Out-of-scope:
+# Out-of-scope
 curl -X POST http://localhost:8000/api/chat \
   -H "Content-Type: application/json" \
-  -d '{"question":"Who won FIFA World Cup 2022?"}'
+  -d '{"question":"Who won the FIFA World Cup 2022?"}'
+```
 
-🔒 Security Notes
+---
 
-Never push .env or API keys
-Use Azure Key Vault / Secrets Manager in production
-Rotate expired tokens regularly
-Use HTTPS for deployed API
+## 🦯 Troubleshooting
 
-🤝 Contributing
+| Issue                 | Fix                                                                            |
+| --------------------- | ------------------------------------------------------------------------------ |
+| ❌ Quota 429           | Gemini quota hit → auto fallback to Groq                                       |
+| ❌ VectorDB missing    | Rebuild with `python3 vectordb.py`                                             |
+| ❌ Port in use         | Edit `app.run(..., port=8000)`                                                 |
+| ❌ No response         | Verify .env keys + logs (`tail -f app.log`)                                    |
+| ⚠️ LangChain warnings | `pip install -U langchain langchain-core langchain-community langchain-chroma` |
 
-PRs welcome!
-Fork the repo
-Create a feature branch
-Submit Pull Request
+---
 
-🧾 License
+## 🔒 Security Notes
 
-MIT © 2025 Dhamm AI LLP
-Empowering adaptive, intelligent tutoring systems.
+* Never commit `.env` or API keys.
+* Use Azure Key Vault or environment variables for production secrets.
+* Always rotate expired tokens (Google & Groq).
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! Fork the repo → create a branch → submit a Pull Request.
+For feature discussions or bug reports, open a GitHub Issue.
+
+---
+
+## 🧾 License
+
+Licensed under the **MIT License**.
+© 2025 **Dhamm AI LLP** — Building Adaptive Learning Intelligence for Education.
