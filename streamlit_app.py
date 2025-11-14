@@ -1,96 +1,74 @@
-import os
 import streamlit as st
+import numpy as np
+import os
 from dotenv import load_dotenv
-
-# LangChain + Vector DB
-from langchain_community.vectorstores import Chroma
-from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
 
 load_dotenv()
 
-# =============================
-# Environment Variables
-# =============================
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-if not GOOGLE_API_KEY:
-    st.error("❌ GOOGLE_API_KEY is missing in .env or Secrets!")
-    st.stop()
-
 if not GROQ_API_KEY:
-    st.error("❌ GROQ_API_KEY is missing in .env or Secrets!")
+    st.error("❌ GROQ_API_KEY missing!")
     st.stop()
 
 # =============================
-# RAG Config
+# Load transcript
 # =============================
-EMBED_MODEL = "models/text-embedding-004"
-PRIMARY_GEMINI = "gemini-2.5-pro"
-VECTORDB_DIR = "vectordb"
-COLLECTION_NAME = "chroma"
-TOP_K = 4
+TRANSCRIPT_PATH = "cleaned_transcript.txt"
+
+if not os.path.exists(TRANSCRIPT_PATH):
+    st.error("❌ cleaned_transcript.txt missing!")
+    st.stop()
+
+with open(TRANSCRIPT_PATH, "r", encoding="utf-8") as f:
+    transcript = f.read().split("\n\n")
 
 # =============================
-# Load Vector DB
+# Tiny Fast Embedding Model
 # =============================
-@st.cache_resource(show_spinner=True)
-def load_vectorstore():
-    embeddings = GoogleGenerativeAIEmbeddings(
-        model=EMBED_MODEL,
-        api_key=GOOGLE_API_KEY
-    )
-    return Chroma(
-        collection_name=COLLECTION_NAME,
-        persist_directory=VECTORDB_DIR,
-        embedding_function=embeddings
-    )
+def embed(text):
+    # VERY FAST HASHING EMBEDDING
+    vector = np.zeros(300)
+    for i, word in enumerate(text.split()):
+        vector[i % 300] += len(word)
+    return vector
 
-vectorstore = load_vectorstore()
+embeddings = np.array([embed(chunk) for chunk in transcript])
 
 # =============================
-# LLM Selection with Fallback
+# Similarity Search
 # =============================
-def call_llm(prompt):
-    # Try Gemini first
-    try:
-        model = ChatGoogleGenerativeAI(
-            model=PRIMARY_GEMINI,
-            api_key=GOOGLE_API_KEY
-        )
-        res = model.invoke(prompt)
-        return res.content
-    except Exception as e:
-        # FALLBACK → Groq LLaMA 3.3 70B
-        try:
-            llm = ChatGroq(
-                model="llama-3.3-70b-versatile",
-                api_key=GROQ_API_KEY
-            )
-            res = llm.invoke(prompt)
-            return res.content
-        except:
-            return "❌ LLM Error: Unable to generate response."
+def search(query, k=4):
+    q_vec = embed(query)
+    scores = np.dot(embeddings, q_vec)
+    idx = scores.argsort()[-k:][::-1]
+    return [transcript[i] for i in idx]
+
+
+# =============================
+# Load Groq LLM
+# =============================
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    api_key=GROQ_API_KEY,
+    temperature=0
+)
 
 # =============================
 # Strict RAG Answer
 # =============================
+REFUSE = "Sorry, this question is outside the scope of the provided transcript."
+
 def rag_answer(question):
-    docs = vectorstore.similarity_search(question, k=TOP_K)
-
-    if not docs:
-        return "Sorry, this question is outside the scope of the provided transcript."
-
-    context = "\n\n".join([d.page_content for d in docs])
-    REFUSAL = "Sorry, this question is outside the scope of the provided transcript."
+    docs = search(question)
+    context = "\n\n".join(docs)
 
     prompt = f"""
-You are a Strict RAG chatbot. 
-Use ONLY the context below to answer the user.
-If answer is not in context → reply exactly:
+STRICT RAG MODE — Answer using ONLY the context.
+If the answer is not in the context, reply with:
 
-"{REFUSAL}"
+"{REFUSE}"
 
 Context:
 {context}
@@ -100,41 +78,22 @@ Question: {question}
 Answer:
 """
 
-    response = call_llm(prompt)
-    if REFUSAL in response:
-        return REFUSAL
+    result = llm.invoke(prompt)
+    return result.content.strip()
 
-    return response
 
 # =============================
-# STREAMLIT UI
+# UI
 # =============================
+st.title("🤖 Dhamm AI – ITS RAG Chatbot (Fast Version)")
 
-st.set_page_config(page_title="Dhamm AI – ITS RAG Chatbot", layout="wide")
+user_q = st.chat_input("Ask your ITS question…")
 
-st.title("🤖 Dhamm AI – ITS ITS Chatbot")
-st.caption("Strict RAG chatbot answering only from the ITS transcript. Out-of-scope questions are politely refused.")
-
-# Chat history
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-# Display past chats
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.write(msg["content"])
-
-# User input
-user_message = st.chat_input("Ask your ITS question…")
-
-if user_message:
-    st.session_state.messages.append({"role": "user", "content": user_message})
-
+if user_q:
     with st.chat_message("user"):
-        st.write(user_message)
+        st.write(user_q)
+
+    answer = rag_answer(user_q)
 
     with st.chat_message("assistant"):
-        answer = rag_answer(user_message)
         st.write(answer)
-
-    st.session_state.messages.append({"role": "assistant", "content": answer})

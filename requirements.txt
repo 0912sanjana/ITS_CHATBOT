@@ -1,39 +1,29 @@
 # =====================================================
-# Core Web Framework (Backend API)
+# Core Web Framework (Optional Backend)
 # =====================================================
-flask                     # Backend API (if you want Flask mode)
-flask-cors                # Enable CORS for Streamlit frontend
-gunicorn                  # Production WSGI server (for deployment)
+flask                  # Optional backend support
+flask-cors             # Allow Streamlit ↔ Flask communication
+gunicorn               # Production WSGI server (optional)
 
 # =====================================================
-# Streamlit Frontend (Chat UI)
+# Streamlit Frontend (Main UI)
 # =====================================================
-streamlit                 # Web UI for ITS RAG Chatbot
-python-dotenv             # Load .env or Streamlit Secrets
+streamlit              # Frontend UI for ITS Chatbot
+python-dotenv          # Loads .env / Secrets.toml values
 
 # =====================================================
-# LangChain (RAG Core)
+# LangChain (RAG + LLM Orchestration Layer)
 # =====================================================
-langchain-core<0.3.0      # Avoids pydantic_v1 errors
-langchain-community        # All loaders, retrievers, utilities
-langchain-groq             # Groq LLaMA 3.1 / 3.3 high-speed LLM support
+langchain-core==0.2.11     # Stable version for Streamlit Cloud
+langchain-community         # Tools, loaders, retrievers
+langchain-groq              # Groq LLaMA 3.x high-speed inference
 
 # =====================================================
-# Google Gemini SDK (Official) — SAFE
-# (Replaces langchain-google-genai which breaks on Cloud)
+# LLM SDKs (Direct API Integrations)
 # =====================================================
-google-generativeai        # Official Gemini API client
+# google-generativeai        # OPTIONAL: For Gemini (commented to speed up build)
 
 # =====================================================
-# Embeddings + Vector Database
+# Utilities (Fast Embeddings / Math / Data)
 # =====================================================
-sentence-transformers      # Local embedding model (MiniLM)
-chromadb                   # Vector DB for semantic search
-faiss-cpu                  # Optional FAISS support (local testing)
-
-# =====================================================
-# Utilities
-# =====================================================
-numpy                      # Math operations
-pandas                     # Data handling
-requests                   # API calls
+numpy                       # Vector math operatio
