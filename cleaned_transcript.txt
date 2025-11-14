@@ -1,0 +1,2665 @@
+Executive summary (one-line)
+Your PKM-based ITS is not just a Q&A assistant — it’s a personal cognitive platform: it organizes each learner’s material into a private knowledge graph, continuously models mastery & memory (DKT + BNKG + LSTM), and converts those signals into measurable, auditable pedagogical actions (tutor + action planner + HITL). That combination of personal PKM + probabilistic tracing + grounded hybrid retrieval + action layer is what separates it from Perplexity, Comet, Gemini, or ChatGPT study features.
+
+
+Comparison axes — head-to-head
+For each axis: what your PKM-ITS does, then how generic tools behave, and the practical difference.
+
+1) Grounding, provenance and evidence
+PKM-ITS (yours): Answers are produced from the learner’s own notes/resources via a hybrid KG-RAG (graph paths + vector chunks + provenance). BNKG nodes include sources[] and every tutor response has traceable citations and a trace store (tool I/O + citations) for auditability. This is baked into the design.
+ ITS— Final Architecture (dhamm …
+
+Perplexity / Comet: Perplexity is an “answer engine” that searches the web and returns citations for web-sourced answers (good for public facts). Comet (Perplexity’s Comet browser) acts as an agentic assistant for web tasks. They give good web citations but are not tailored to a learner’s private note corpus unless integrated as enterprise search.
+ChatGPT / Gemini study features: Study Mode / Guided Learning emphasize step-by-step help; grounding is improving (and OpenAI/Google add citation-style links in some features), but they typically rely on model priors or public corpora unless you feed custom context/files to the session. OpenAI’s Study Mode is focused on pedagogy rather than persistent per-user provenance.
+Practical difference: Your system gives user-specific provenance (answers tied to the learner’s uploaded notes + concept graph), enabling verifiable remediation and teacher review. Generic tools are great for web facts but don’t provide the same per-learner source accountability by default.
+
+
+2) Personalization & cognitive modeling
+PKM-ITS: Uses DKT (online LSTM) + Bayesian Knowledge Graph (BNKG) and memory decay LSTM to compute per-concept mastery probabilities, retention risk, and to propagate mastery across prerequisites. This drives the Action Planner & bandit sequencer for personalized interventions.
+ ITS— Final Architecture (dhamm …
+
+Generic tools: Perplexity / ChatGPT / Gemini personalize conversational context in a session but do not continuously model mastery across time with formal DKT/Bayesian updates or schedule spaced repetition at the concept level (unless augmented by an external system).
+
+Practical difference: Your system gives measurable mastery metrics and long-term adaptation (e.g., schedule a review when retention drops). Generic assistants can simulate tutoring but lack persistent user models and granular concept-level mastery tracing.
+
+
+3) Retrieval architecture (hybrid KG-RAG vs plain vector / web search)
+PKM-ITS: Hybrid KG-RAG (LlamaIndex + Neo4j + Milvus) — merges explicit concept graph paths and vector chunks; retrieval results carry provenance and are filtered by tenant/course/user/topic.
+ ITS— Final Architecture (dhamm …
+
+Perplexity & Comet: Primarily web retrieval + LLM summarization; Comet adds agentic web actions (browsing, interacting with tabs). Perplexity’s strength is web-sourced answers with citations.
+ChatGPT / Gemini: Use embeddings / context windows for retrieval augmented generation when given documents; recent product features include Guided Learning / Study Mode for structured walkthroughs, but they still rely on the provided context + model priors unless you maintain a separate graph.
+Practical difference: Graph + vector retrieval lets you query “show me prerequisites to X that the student is weak on” and get explicit node paths — crucial for explainable remediation. Generic tools can find related content but cannot inherently reason over a learner’s prerequisite graph.
+
+
+4) Actioning and pedagogical loop (planning, bandits, HITL)
+PKM-ITS: Action Layer (planner + bandit sequencer + scheduler) transforms predictions into interventions (nudges, in-session tasks, teacher escalations) and logs outcomes for offline evaluation — closing the loop.
+ ITS— Final Architecture (dhamm …
+
+Generic tools: Can recommend next steps conversationally but don’t automatically schedule cohort interventions, run bandit experiments, or integrate programmatic teacher escalation and off-policy evaluation out of the box.
+
+Practical difference: Your platform operationalizes learning science into measurable interventions and A/B testing; generic assistants are one-off tutors without continuous policy optimization.
+
+
+5) Explainability, audit & compliance
+PKM-ITS: Trace store, CPT recalibration, grounding metrics, PII redaction, audit logs, and teacher review built into the system design. Targets like ≥85% grounded answers and hallucination flags are explicit.
+ ITS— Final Architecture (dhamm …
+
+Generic tools: Vary widely — Perplexity’s citations help trace web claims; ChatGPT/Gemini are improving transparency but enterprise education offerings (ChatGPT Edu, Gemini for Education) add admin controls — they still lack built-in BNKG-style explainable causal propagation.
+Practical difference: When institutions need audit trails, objective mastery evidence, or data-privacy guarantees (e.g., student PII), your PKM-ITS is designed to meet those needs; commodity assistants need heavy platform work to reach parity.
+
+
+6) Privacy, deployment & cost control
+PKM-ITS: Model router (local inference vs cloud), PII redaction before cloud, strict egress control, tenant isolation and cost-aware routing. This is a production-grade, compliance-first approach.
+ ITS— Final Architecture (dhamm …
+
+Generic tools: Cloud–first; enterprise layers (ChatGPT Edu, Gemini for Education) add admin controls but you still rely on vendor policies and may have limited local inference options or vendor contracts.
+Practical difference: For sensitive institutional deployments, your router + local LLM options reduce data exposure and cost — important for large-scale educational pilots.
+
+
+7) Observability, evaluation & drift handling
+PKM-ITS: OTLP metrics across services, golden-set evaluations, automated recalibration (n8n), CPT drift detection and monthly BN recalibration.
+ ITS— Final Architecture (dhamm …
+
+Generic tools: Provide product telemetry but not course-level golden-set evals or BN CPT recalibration specifically targeted to pedagogical drift.
+
+Practical difference: Your platform supports operational SLOs specific to learning quality (grounding rate, hallucination thresholds), making it suitable for institutional SLAs.
+
+
+Tangible benefits & real-world applications
+For learners (IRL)
+Visible mastery maps: Learner sees what they know and the prerequisite chain — supports metacognition and study planning.
+
+Targeted remediation: System surfaces exact weak nodes + suggested micro-tasks; reduces wasted study time.
+
+Spaced recall & retention: Memory LSTM schedules reviews when retention drops — improves long-term retention.
+
+Contextual doubt resolution: Tutor answers from learner notes and linked sources — faster clarification.
+
+For teachers & admins
+Actionable cohort analytics: Heatmaps reveal class-wide misconceptions before exams.
+
+Curriculum alignment: Bloom tagging + PYQ mapping shows mismatch coverage.
+
+HITL workflows: Escalations feed teachers curated, concise review tasks.
+
+For institutions / operations
+Audit & compliance: Verifiable citations & trace store for academic oversight.
+
+Cost control via router: Route heavy inference to cheaper models for non-sensitive tasks, preserve budget for high-value ops.
+
+Continuous improvement: Off-policy logging + bandit replay for policy improvement.
+
+(These benefits are drawn directly from features and KPIs in your PRD/Architecture docs.)
+
+How this differs from Perplexity / Comet / Gemini / ChatGPT (short)
+Perplexity — excellent web answer engine with citations; not a personalized, persistent learner model.
+Comet (Perplexity Comet browser) — agentic browsing & task automation; helps with web tasks but not structured pedagogical action over a private knowledge graph.
+ChatGPT Study Mode / ChatGPT Edu — improved pedagogy and campus deployment features; offers guided step-throughs and institutional controls, but doesn’t inherently persist DKT/Bayesian mastery across user content unless integrated into a separate LMS.
+Gemini Guided Learning — Google’s guided learning / education pushes structured tutoring; strong but still mainly a generalist model unless institutionally integrated with private student PKM.
+
+Pros (what you get) — summary
+Explainable, auditable personalization (BNKG + trace store).
+ ITS— Final Architecture (dhamm …
+
+Persistent learner model & retention scheduling (DKT + memory LSTM).
+ Product Requirements Document (…
+
+Hybrid retrieval gives grounded responses from user materials.
+ ITS— Final Architecture (dhamm …
+
+Operational readiness: model router, observability, privacy controls, and action layer for institutional pilots.
+ ITS— Final Architecture (dhamm …
+
+Pedagogical integration: Bloom taxonomy tagging, PYQ mapping, teacher workflows — all measurable KPIs.
+ Product Requirements Document (…
+
+
+Cons / risks (and mitigations)
+Complexity & engineering cost — BNKG + DKT + routers + Milvus/Neo4j requires engineering & infra.
+ Mitigation: Phase rollout; start with limited subjects, use light-weight vector retrieval, then expand BNKG edges as data grows.
+
+Cold-start for new users — Early users have sparse PKM events, reducing DKT accuracy.
+ Mitigation: Use hybrid bootstrapping: initial diagnostic quizzes + warm start using program-level priors; offline BiLSTM for cold-start parameterization.
+ ITS— Final Architecture (dhamm …
+
+Graph drift & CPT instability — Incorrect edge weights/prereqs can propagate errors.
+ Mitigation: Shadow runs, monthly CPT EM recalibration, teacher review queues.
+ ITS— Final Architecture (dhamm …
+
+Cost & model sprawl — Multiple model variants and cloud APIs increase cost.
+ Mitigation: Model router with cost policies and local runners for non-sensitive tasks.
+ ITS— Final Architecture (dhamm …
+
+Data privacy / legal requirements — Storing student notes & logs requires compliance.
+ Mitigation: PII redaction, local inference for sensitive flows, immutable audit logs, right-to-erasure workflows.
+ ITS— Final Architecture (dhamm …
+
+Maintenance overhead — Retraining schedules, eval pipelines and n8n automations are nontrivial.
+ Mitigation: Automate retraining pipelines & golden sets; budget SRE/MLops for lifecycle.
+
+
+Concrete KPIs to track (recommended)
+Grounding rate (citations used / answers) — target ≥85%.
+ ITS— Final Architecture (dhamm …
+
+Mastery lift on weak nodes (weekly) — target +20–30%.
+ ITS— Final Architecture (dhamm …
+
+Retention prediction accuracy (revisit validation) — target ≥90%.
+ Product Requirements Document (…
+
+Tutor latency (p95) — target <4s (warm cache).
+ ITS— Final Architecture (dhamm …
+
+Action CTR & completion uplift (A/B) — target ≥12–20% uplift.
+ ITS— Final Architecture (dhamm …
+
+
+Final recommendation (practical path to outcompete commodity tools)
+Pilot with clear success metrics (choose 1 subject, e.g., Polity): instrument golden questions + defined cohort and run AB tests vs baseline.
+ Product Requirements Document (…
+
+Start with hybrid retrieval but simple BKNG edges for core concepts — improves explainability quickly without full graph density.
+ ITS— Final Architecture (dhamm …
+
+Expose polished teacher console & citation trace — this is a differentiator for institutions who value governance.
+ ITS— Final Architecture (dhamm …
+
+Emphasize privacy & local inference as a selling point vs big cloud players.
+ ITS— Final Architecture (dhamm …
+
+
+PKM-Integrated Intelligent Tutoring System (Dhamm.AI Context File)
+
+📘 Chunk 1: System Overview
+The PKM-based ITS (Personal Knowledge Management–integrated Intelligent Tutoring System) developed by Dhamm.AI is a next-generation, adaptive learning ecosystem that connects personal learning data with intelligent tutoring capabilities.
+ It combines:
+PKM (Personal Knowledge Management) to organize learner inputs like notes, lectures, and resources into a connected graph.
+
+Deep Knowledge Tracing (DKT) and Bayesian Knowledge Graph (BNKG) for mastery prediction and probabilistic concept relationships.
+
+Hybrid KG-RAG retrieval for grounded, source-backed answers.
+
+LLM Tutor + Action Layer to deliver personalized guidance, nudges, and interventions.
+
+Its goal: make learning visible, explainable, personalized, and measurable.
+
+🧩 Chunk 2: Key Design Objectives
+Grounded Intelligence: Every AI-generated response cites real sources and graph paths.
+
+Personalization by Evidence: Combines DKT predictions with Bayesian priors and memory models.
+
+Privacy-Aware Architecture: Local inference options, tenant isolation, and PII redaction.
+
+Adaptive Tutoring: Learners get feedback, tasks, and review schedules based on mastery evidence.
+
+Cost-Aware Scaling: Routes tasks to optimal model based on latency and sensitivity.
+
+
+🏗️ Chunk 3: Layered Architecture
+The architecture consists of 6 layers:
+Experience Layer:
+
+Tutor chat UI (streamed answers, citations).
+
+PKM Canvas for note editing and linking (Cytoscape visualization).
+
+Dashboards for Bloom progression, mastery heatmaps, and cohort analytics.
+
+Orchestration Layer (FastAPI):
+
+Tutor Orchestrator assembles prompts and manages session state.
+
+Model Router selects models based on privacy, latency, and cost.
+
+MCP Tool Gateway handles typed tool calls (SQL, Graph, Vector, Python).
+
+Knowledge Layer:
+
+BNKG in Neo4j for concept maps and Bloom tags.
+
+Vector retrieval in Milvus for semantic chunking.
+
+Hybrid KG-RAG combines both for grounded retrieval.
+
+Learning Models Layer:
+
+DKT (PyTorch) for mastery prediction.
+
+Memory Service for retention decay and spaced repetition.
+
+Policy Engine for hinting, pacing, and task difficulty.
+
+Data Layer:
+
+PKM ingestion (files, notes, OCR, ASR).
+
+ETL pipelines for event → feature transformation.
+
+Storage in PostgreSQL + MinIO/S3 + Redis.
+
+Ops Layer:
+
+Observability via OTLP exporters and n8n automations.
+
+Automated reindexing, retraining, and backup routines.
+
+
+🧮 Chunk 4: Data Flow Summary
+User interacts via Tutor UI or PKM Canvas.
+
+Orchestrator gathers context and sends prompt to Model Router.
+
+Router picks LLM (local Zamba/Ollama or cloud Claude/Kimi).
+
+Tutor can call tools via MCP Gateway → Neo4j (BNKG), Milvus (semantic), or Python Sandbox.
+
+PKM Ingest pipelines process new notes/files and update embeddings + BNKG.
+
+Events (answers, quizzes) feed DKT + Memory → update BNKG → inform Policy Engine.
+
+Action Layer generates interventions (tasks, reminders, feedback).
+
+Teacher dashboard receives escalations via HITL.
+
+
+📈 Chunk 5: Learning Models & Intelligence
+🔹 DKT Service
+Predicts mastery probability per concept from past interactions.
+🔹 Memory Service
+Models retention decay over time and triggers spaced repetition.
+🔹 BNKG (Bayesian Knowledge Graph)
+Represents concepts as nodes with probabilities and relationships.
+🔹 BiDKT Variants
+Bayesian-Integrated DKT: Online updates with CPT refresh.
+
+Bidirectional DKT: Offline analytics with past-future context.
+
+🔹 Policy Engine
+Combines DKT + BNKG + memory scores to personalize pacing and difficulty.
+
+🎯 Chunk 6: Action Layer (Decision → Intervention → Outcome)
+Planner: Scores possible actions based on knowledge gap, forget risk, and pedagogical value.
+
+Bandit Sequencer: Chooses best intervention (review, quiz, explanation, etc.).
+
+Scheduler: Delivers in-app or via email/Matrix at optimized times.
+
+Teacher Escalation: Routes difficult cases for human feedback (HITL).
+
+Compliance & Audit: Tracks every action-outcome pair for reinforcement learning.
+
+
+💬 Chunk 7: Core APIs
+/events/log → Capture user actions.
+
+/graph/state → Retrieve mastery graph.
+
+/tutor/query → Tutor response + citations.
+
+/dkt/infer → Mastery inference.
+
+/dashboard/bloom → Bloom-level performance.
+
+/actions/plan → Personalized interventions.
+
+/actions/feedback → Logs learner responses for policy updates.
+
+
+🧠 Chunk 8: Pedagogical Core
+The ITS aligns with Bloom’s Taxonomy across six levels:
+ Remember → Understand → Apply → Analyze → Evaluate → Create.
+ Each question, note, and resource is automatically tagged via Bloom classifier.
+ Learner progression is tracked across these dimensions, making knowledge growth measurable.
+ Deep Knowledge Tracing + Bloom mapping = cognitive fingerprint per learner.
+
+🧩 Chunk 9: PRD Highlights
+Built for UPSC GS Polity as the pilot module with 1000+ fine-tuned questions.
+
+Components: PKM Canvas, Graph Visualization, Bloom Dashboard, Study Path Planner, Tutor Chatbot, and Self-Assessment.
+
+Backend stack: FastAPI, Neo4j, PyTorch (DKT), MinIO/S3, Redis Streams.
+
+Trained on 30 years of PYQs for benchmarking and gap analysis.
+
+Weekly retraining of models, monthly BN recalibration, RL-based tutor refinement.
+
+KPIs:
+
++30% improvement in scores,
+
+≥85% tutor accuracy,
+
+<2s feedback latency,
+
+≥95% concept mapping accuracy.
+
+
+🧠 Chunk 10: Differentiation (vs Generic AI Tools)
+Unlike Perplexity, ChatGPT, Gemini, or Comet:
+Your ITS builds a persistent learner model — not session-based personalization.
+
+Uses evidence-based reasoning through DKT + BNKG.
+
+Provides verifiable provenance (citations + graph path).
+
+Runs local inference with full privacy controls.
+
+Enables teacher-in-the-loop intervention for real pedagogy, not just chat-based tutoring.
+
+It is not an “AI assistant” — it’s an adaptive cognitive architecture.
+
+📊 Chunk 11: Observability & Metrics
+Grounding rate: ≥85%.
+
+Tool-verified logic: ≥70%.
+
+Hallucination rate: <5%.
+
+p95 latency: <4s.
+
+Mastery lift: +20–30%.
+
+Token cost reduction: −20%.
+
+Uptime (SLO): ≥99.5%.
+
+Automation (via n8n):
+Nightly reindex & backup.
+
+Weekly evaluation reports.
+
+Monthly CPT recalibration.
+
+
+🔒 Chunk 12: Privacy, Security, and Compliance
+OIDC SSO + RBAC/ABAC for access control.
+
+PII redaction before any cloud inference.
+
+Encryption at rest & in transit (TLS 1.2+, KMS).
+
+Right-to-erasure and immutable audit logs.
+
+Tenant isolation: separate data silos for institutions.
+
+Designed for FERPA/GDPR-style educational compliance.
+
+
+🚀 Chunk 13: Roadmap & Deployment
+Pilot Phase (Current)
+Polity module deployed with 1,000+ trained Qs and Bloom classifier.
+
+Fine-tuned models integrated into dashboard.
+
+Phase 2
+Integration with institutional LMS and analytics dashboards.
+
+Phase 3
+Multi-subject rollout (UPSC + JEE + CLAT + University programs).
+
+Phase 4
+Full ITS ecosystem with live cohort insights, adaptive policy tuning, and automated evaluation cycles.
+
+
+🧩 Chunk 14: Tangible Benefits
+For Students:
+Metacognitive feedback (“know what you know”).
+
+Smart revision via memory decay detection.
+
+Concept graph visualizations.
+
+Context-aware tutoring.
+
+Personalized Bloom-level goals.
+
+For Institutions:
+Real-time cohort mastery heatmaps.
+
+Curriculum alignment and Bloom tracking.
+
+Scalable AI tutor reducing faculty cognitive load.
+
+Data-driven remediation planning.
+
+
+⚙️ Chunk 15: Risks & Mitigations
+
+💡 Chunk 16: Vision Statement
+“To build the world’s first responsible learning intelligence —
+ a system that understands how every learner learns.”
+Dhamm.AI’s PKM-based ITS bridges the gap between knowledge and cognition,
+ creating individual intellectual infrastructure for every student.
+ It turns data into insight, insight into guidance, and guidance into growth.
+
+
+
+Slide 1: The Learning Problem We’re Solving
+Title: “Why Students Still Struggle - Even With Access to Content”
+Visual: Collage or infographic (books, scattered notes, tired student at desk)
+Key Talking Points:
+Students face information overload, not learning clarity.
+
+Lack of scaffolding → fragmented understanding.
+
+Institutions can’t track real-time conceptual mastery.
+
+Personalized help remains reactive, not proactive
+Students don’t have a personal learning framework to organize what they learn.
+.
+
+Bottom Line (tagline):
+“The challenge isn’t access to knowledge -  it’s knowing what to learn next and why.”
+
+ Slide 2: Our Solution — A Personalized Learning Intelligence System
+Title: “A Seamless, Self-Adapting Learning Companion”
+Visual: Simplified system loop diagram:
+LMS > Learner → PKM Canvas → DKT (Learning Tracker) → Bloom Engine → Tutor Chat → Feedback Loop.
+Talking Points (bullet-style, short phrases):
+Organize and link personal notes, lectures, and questions.
+
+Tracks what the learner knows, forgets, and needs next.
+
+Tutor agent gives real-time feedback and guided practice.
+
+Institutions gain insight into learning patterns and gaps.
+
+Bottom Line:
+“One platform that learns about the learner.”
+
+Slide 3: Prototype in Action (Polity Subject)
+Title: “From Prototype to Learning Insights”
+Visual:
+ Use 10–15 sec clip or 2 screenshots:
+Knowledge graph (concept map view).
+
+Assessment dashboard or Bloom tagging output.
+
+Talking Points:
+Built on real 1,000+ UPSC polity questions.
+
+Auto-generated Bloom-level tagging of questions and notes.
+
+Smart chatbot answers contextual queries like a human tutor.
+
+Students get concept mastery visualized as graphs.
+
+
+ Slide 4: Tangible Benefits for Learners
+Title: “Empowering Every Learner with Clarity and Control”
+Visual: 3 Icons or small infographics (Metacognition, Feedback, Confidence)
+Points (no more than 6 words each):
+ Metacognitive feedback: Know what you know.
+
+ Smart revision: Detects forgetting patterns.
+
+ Targeted assessments: Based on weak areas.
+
+ Concept graph view: Learning becomes visible.
+
+ Adaptive scheduling: Personalized review timelines.
+
+ Instant in-depth doubt solving tutor.
+
+Bottom Line:
+“Turns studying from a routine into a guided journey.”
+
+ Slide 5: Learning Space in loop with institutional policy 
+Title: “Helping Institutions Enable Scalable, Evidence-Based Personalised Learning”
+Visual: Split layout - “Student Dashboard” and “Institution Dashboard”
+Key Points:
+Cohort analytics: mastery group heatmaps and progression.
+
+Automated Bloom-level tracking for curriculum benchmarking Tracing.
+
+Insights into learning gaps before exams.
+
+Data-driven scaffolding and remediation planning.
+
+Bottom Line:
+“A unified platform for personalized and institutional intelligence.”
+
+
+
+
+
+ Slide 6: Early Impact & KPIs
+Title: “What We’ve Achieved and What’s Next”
+Visual: Simple dashboard view + KPI icons (speedometers, arrows, etc.)
+KPIs (examples, tweak for actual results):
++27% improvement in concept recall after 2 weeks.
+
+<3s feedback latency in tutor responses.
+
+85%+ Bloom tagging accuracy.
+
+Students spent 2.3x longer in revision modules.
+
+90% engagement with assessment dashboard.
+
+Bottom Line:
+“Measured impact, scalable design.”
+
+ Slide 7: The Road Ahead
+Title: “Scaling Personalized Learning Intelligence”
+Visual: Horizontal roadmap or milestone graphic
+Milestones:
+ Prototype completed for Polity (UPSC GS).
+
+ Phase 2: Integration with institutional LMS.
+
+ Phase 3: Multi-subject deployment (UPSC + University modules+JEE + SAT +MAT CLAT).
+
+ Phase 4: Full ITS rollout with real-time insights at scale.
+
+Closing Line:
+“From fragmented learning to intelligent ecosystems -
+ Dhamm.AI is redefining how institutions understand learning.”
+
+
+Product
+ 
+Requirements
+ 
+Document
+ 
+(PRD)
+ 
+Project
+ 
+Title:
+ 
+PKM-Integrated
+ 
+Intelligent
+ 
+Tutoring
+ 
+System
+ 
+with
+ 
+DKT
+ 
+Backend
+ 
+(GS
+ 
+for
+ 
+UPSC)
+ 
+ 
+1.
+ 
+Executive
+ 
+Summary
+ 
+This
+ 
+project
+ 
+delivers
+ 
+a
+ 
+next-generation
+ 
+learning
+ 
+platform
+ 
+blending
+ 
+Personal
+ 
+Knowledge
+ 
+Management
+ 
+(PKM),
+ 
+Deep
+ 
+Knowledge
+ 
+Tracing
+ 
+(DKT),
+ 
+and
+ 
+a
+ 
+probabilistic
+ 
+Intelligent
+ 
+Tutoring
+ 
+System
+ 
+(ITS)
+ 
+for
+ 
+UPSC
+ 
+General
+ 
+Studies.
+ 
+The
+ 
+platform
+ 
+transforms
+ 
+static
+ 
+note-taking
+ 
+and
+ 
+learning
+ 
+activities
+ 
+into
+ 
+a
+ 
+dynamic,
+ 
+personalized
+ 
+learning
+ 
+engine
+ 
+that
+ 
+adapts
+ 
+to
+ 
+user
+ 
+cognition,
+ 
+preparation
+ 
+background,
+ 
+and
+ 
+exam
+ 
+needs,
+ 
+powered
+ 
+by
+ 
+real-time
+ 
+AI
+ 
+and
+ 
+advanced
+ 
+backend
+ 
+models.
+ 
+ 
+2.
+ 
+Objectives
+ 
+&
+ 
+Vision
+ 
+●
+ 
+Enable
+ 
+UPSC
+ 
+aspirants
+ 
+to
+ 
+organize,
+ 
+link,
+ 
+and
+ 
+reflect
+ 
+on
+ 
+their
+ 
+learning
+ 
+using
+ 
+PKM
+ 
+principles
+ 
+ 
+●
+ 
+Actively
+ 
+track
+ 
+mastery,
+ 
+memory
+ 
+decay,
+ 
+and
+ 
+cognitive
+ 
+progression
+ 
+at
+ 
+the
+ 
+concept
+ 
+and
+ 
+Bloom's
+ 
+taxonomy
+ 
+level
+ 
+ 
+●
+ 
+Provide
+ 
+personalized
+ 
+AI
+ 
+tutoring,
+ 
+assessments,
+ 
+and
+ 
+feedback
+ 
+using
+ 
+adaptive
+ 
+models
+ 
+ 
+●
+ 
+Visualize
+ 
+knowledge
+ 
+growth
+ 
+in
+ 
+an
+ 
+actionable
+ 
+dashboard
+ 
+ 
+●
+ 
+Use
+ 
+30
+ 
+years’
+ 
+PYQs
+ 
+for
+ 
+assessment,
+ 
+benchmarking,
+ 
+and
+ 
+personalized
+ 
+gap
+ 
+analysis
+ 
+ 
+ 
+ 
+ 
+3.
+ 
+Core
+ 
+Functional
+ 
+Modules
+ 
+Frontend
+ 
+●
+ 
+PKM
+ 
+Canvas:
+ 
+Visual
+ 
+workspace
+ 
+for
+ 
+connecting
+ 
+notes
+ 
+(concepts)
+ 
+and
+ 
+resources
+ 
+ 
+●
+ 
+Graph
+ 
+Visualization:
+ 
+Mastery
+ 
+and
+ 
+relationship
+ 
+map,
+ 
+color-coded
+ 
+by
+ 
+Bloom’s
+ 
+level
+ 
+ 
+●
+ 
+Bloom
+ 
+Dashboard:
+ 
+Progress
+ 
+tracking
+ 
+(Remember,
+ 
+Understand,
+ 
+Apply,
+ 
+Analyze,
+ 
+Evaluate,
+ 
+Create)
+ 
+ 
+●
+ 
+Sidebar:
+ 
+User
+ 
+stats,
+ 
+tracked
+ 
+concepts,
+ 
+activity
+ 
+logs
+ 
+ 
+●
+ 
+Study
+ 
+Path
+ 
+Planner:
+ 
+Drag
+ 
+and
+ 
+drop
+ 
+modules,
+ 
+customize
+ 
+or
+ 
+use
+ 
+standard
+ 
+paths
+ 
+ 
+●
+ 
+Tutor
+ 
+Chatbot:
+ 
+Retractable
+ 
+Q&A
+ 
+panel,
+ 
+real-time
+ 
+feedback,
+ 
+hints,
+ 
+resource
+ 
+linking
+ 
+ 
+●
+ 
+Self-Assessment:
+ 
+Custom
+ 
+quizzes,
+ 
+PYQs,
+ 
+timed
+ 
+tests,
+ 
+analytics
+ 
+ 
+●
+ 
+Semantic
+ 
+Search:
+ 
+Find
+ 
+related
+ 
+resources
+ 
+by
+ 
+embeddings/SPARQL
+ 
+ 
+Backend
+ 
+●
+ 
+FastAPI
+ 
+Gateway:
+ 
+REST/API/WebSocket
+ 
+endpoints
+ 
+(user,
+ 
+logs,
+ 
+graph,
+ 
+tutoring,
+ 
+feedback)
+ 
+ 
+●
+ 
+PKM
+ 
+Event
+ 
+Logger:
+ 
+Tracks
+ 
+and
+ 
+stores
+ 
+all
+ 
+PKM
+ 
+interactions
+ 
+(create,
+ 
+edit,
+ 
+link,
+ 
+search)
+ 
+ 
+●
+ 
+Feature
+ 
+Builder:
+ 
+Converts
+ 
+user
+ 
+actions
+ 
+to
+ 
+model
+ 
+inputs
+ 
+(concepts,
+ 
+Bloom
+ 
+tags,
+ 
+time,
+ 
+labels)
+ 
+ 
+●
+ 
+DKT
+ 
+Model
+ 
+(PyTorch):
+ 
+LSTM-based,
+ 
+mastery
+ 
+prediction
+ 
+per
+ 
+concept/Bloom
+ 
+level
+ 
+ 
+●
+ 
+LSTM
+ 
+Memory
+ 
+Model:
+ 
+Predicts
+ 
+concept
+ 
+retention
+ 
+and
+ 
+knowledge
+ 
+decay
+ 
+●
+ 
+Bayesian
+ 
+Knowledge
+ 
+Graph:
+ 
+Tracks
+ 
+uncertain
+ 
+mastery,
+ 
+integrates
+ 
+Bloom-level
+ 
+evidence
+ 
+ 
+●
+ 
+Tutor
+ 
+Engine:
+ 
+Merges
+ 
+models,
+ 
+generates
+ 
+suggestions,
+ 
+recommendations,
+ 
+adaptive
+ 
+learning
+ 
+paths
+ 
+ 
+●
+ 
+Database:
+ 
+PostgreSQL
+ 
+(users/events/logs),
+ 
+Neo4j
+ 
+(concept
+ 
+graph)
+ 
+ 
+●
+ 
+Realtime
+ 
+Engine:
+ 
+Redis
+ 
+Streams,
+ 
+MLflow,
+ 
+Docker
+ 
+microservices
+ 
+ 
+●
+ 
+Storage:
+ 
+MinIO/S3
+ 
+for
+ 
+checkpoints/model
+ 
+persistence
+ 
+ 
+ 
+4.
+ 
+User
+ 
+Workflow/Journey
+ 
+1.
+ 
+Onboarding
+:
+ 
+User
+ 
+registers,
+ 
+answers
+ 
+questionnaire
+ 
+about
+ 
+preparation
+ 
+level,
+ 
+expertise,
+ 
+topics
+ 
+of
+ 
+interest/weakness,
+ 
+and
+ 
+intended
+ 
+exam
+ 
+date.
+ 
+ 
+2.
+ 
+Dashboard
+:
+ 
+Presented
+ 
+with
+ 
+sidebar
+ 
+for
+ 
+user
+ 
+stats,
+ 
+concept
+ 
+tracking;
+ 
+main
+ 
+canvas
+ 
+PKM
+ 
+workspace
+ 
+for
+ 
+note-linking;
+ 
+graph
+ 
+panel
+ 
+for
+ 
+mastery;
+ 
+tutor
+ 
+sidebar
+ 
+for
+ 
+guidance.
+ 
+ 
+3.
+ 
+Study
+ 
+Session
+ 
+&
+ 
+Planning
+:
+ 
+Drag
+ 
+and
+ 
+drop
+ 
+modules
+ 
+or
+ 
+use
+ 
+standard
+ 
+path;
+ 
+engage
+ 
+with
+ 
+resources,
+ 
+take
+ 
+notes,
+ 
+link
+ 
+concepts;
+ 
+upload
+ 
+YouTube
+ 
+lectures
+ 
+for
+ 
+insights.
+ 
+ 
+4.
+ 
+Assessment
+:
+ 
+Attempt
+ 
+PYQs,
+ 
+custom
+ 
+quizzes
+ 
+mapped
+ 
+to
+ 
+specific
+ 
+concepts
+ 
+and
+ 
+Bloom
+ 
+levels.
+ 
+Get
+ 
+instant
+ 
+feedback,
+ 
+hints,
+ 
+analysis.
+ 
+ 
+5.
+ 
+Tutor
+ 
+Interaction
+:
+ 
+Chatbot
+ 
+answers
+ 
+doubts,
+ 
+suggests
+ 
+next
+ 
+topics,
+ 
+nudges
+ 
+for
+ 
+review.
+ 
+Context-aware
+ 
+help
+ 
+from
+ 
+connected
+ 
+notes,
+ 
+concept
+ 
+graph,
+ 
+and
+ 
+resources.
+ 
+ 
+6.
+ 
+Progress
+ 
+Visualization
+:
+ 
+Color-coded
+ 
+graph
+ 
+shows
+ 
+current
+ 
+mastery,
+ 
+memory
+ 
+scores,
+ 
+learning
+ 
+gaps;
+ 
+bloom
+ 
+dashboard
+ 
+visualizes
+ 
+Bloom-level
+ 
+progression.
+ 
+ 
+7.
+ 
+Review
+ 
+and
+ 
+Iteration
+:
+ 
+System
+ 
+tracks
+ 
+inactivity,
+ 
+prompts
+ 
+new
+ 
+challenges,
+ 
+suggests
+ 
+revision
+ 
+blocks
+ 
+based
+ 
+on
+ 
+memory
+ 
+decay
+ 
+and
+ 
+weak
+ 
+links.
+ 
+ 
+8.
+ 
+Mentor
+ 
+Mode
+ 
+(expandable):
+ 
+Option
+ 
+for
+ 
+expert/peer
+ 
+review,
+ 
+shared
+ 
+workspace,
+ 
+challenge
+ 
+mode.
+ 
+ 
+ 
+5.
+ 
+System
+ 
+Architecture
+ 
+Overview
+ 
+Microservices
+ 
+text
+ 
+-
+ 
+FastAPI
+ 
+Gateway
+ 
+-
+ 
+Event
+ 
+Ingestor
+ 
+-
+ 
+Feature
+ 
+Builder
+ 
+-
+ 
+DKT
+ 
+Service
+ 
+(LSTM,
+ 
+PyTorch)
+ 
+-
+ 
+Memory
+ 
+Service
+ 
+-
+ 
+BayesNet
+ 
+Service
+ 
+(pgmpy)
+ 
+-
+ 
+Tutor
+ 
+Engine
+ 
+-
+ 
+Graph
+ 
+Service
+ 
+(Neo4j)
+ 
+ 
+Data
+ 
+Flow
+ 
+text
+ 
+PKM
+ 
+Event
+ 
+→
+ 
+Event
+ 
+Ingestor
+ 
+→
+ 
+PostgreSQL
+ 
+→
+ 
+Feature
+ 
+Service
+ 
+→
+ 
+DKT
+ 
+(mastery)
+ 
+→
+ 
+Memory
+ 
+LSTM
+ 
+→
+ 
+BayesNet
+ 
+(probabilities)
+ 
+→
+ 
+Tutor
+ 
+Engine
+ 
+→
+ 
+Graph
+ 
+Service
+ 
+(updates
+ 
+UI)
+ 
+→
+ 
+Realtime
+ 
+feedback
+ 
+via
+ 
+WebSocket
+ 
+ 
+Core
+ 
+APIs
+ 
+●
+ 
+POST
+ 
+/events/log:
+ 
+log
+ 
+user
+ 
+PKM
+ 
+action
+ 
+ 
+●
+ 
+GET
+ 
+/graph/state:
+ 
+retrieve
+ 
+user’s
+ 
+mastery
+ 
+graph
+ 
+ 
+●
+ 
+GET
+ 
+/tutor/recommendations:
+ 
+fetch
+ 
+nudges
+ 
+ 
+●
+ 
+POST
+ 
+/tutor/plan:
+ 
+request
+ 
+learning
+ 
+path
+ 
+ 
+●
+ 
+GET
+ 
+/mastery/snapshot:
+ 
+get
+ 
+Bloom-dashboard
+ 
+progress
+ 
+ 
+●
+ 
+WS
+ 
+/ws/stream:
+ 
+push
+ 
+realtime
+ 
+feedback/update
+ 
+ 
+Frontend
+ 
+Stack
+ 
+●
+ 
+React.js,
+ 
+Tailwind
+ 
+CSS,
+ 
+Cytoscape.js
+ 
+(visual
+ 
+workspace)
+ 
+ 
+●
+ 
+WebSocket
+ 
+for
+ 
+live
+ 
+updates
+ 
+ 
+●
+ 
+Semantic
+ 
+search
+ 
+(embeddings/SPARQL)
+ 
+ 
+ 
+ 
+6.
+ 
+AI/ML
+ 
+Model
+ 
+Integration
+ 
+●
+ 
+DKT
+ 
+Training
+:
+ 
+Trained
+ 
+on
+ 
+sequence
+ 
+of
+ 
+PKM
+ 
+actions,
+ 
+labeled
+ 
+by
+ 
+concept
+ 
+and
+ 
+Bloom
+ 
+taxonomy,
+ 
+leveraging
+ 
+exam-specific
+ 
+data
+ 
+(PYQs,
+ 
+module
+ 
+coverage)
+ 
+ 
+●
+ 
+LSTM
+ 
+Memory
+:
+ 
+Predicts
+ 
+how
+ 
+recently/strongly
+ 
+a
+ 
+user
+ 
+remembers
+ 
+a
+ 
+concept;
+ 
+decay
+ 
+curve
+ 
+informed
+ 
+by
+ 
+revisit
+ 
+intervals.
+ 
+ 
+●
+ 
+Bayesian
+ 
+Graph
+:
+ 
+Probabilistic
+ 
+updates,
+ 
+merges
+ 
+mastery
+ 
+“confidence”
+ 
+from
+ 
+DKT,
+ 
+memory,
+ 
+and
+ 
+Bloom-level
+ 
+evidence.
+ 
+ 
+●
+ 
+Tutor
+ 
+Engine
+:
+ 
+Surface
+ 
+personalized
+ 
+feedback,
+ 
+challenge
+ 
+users,
+ 
+and
+ 
+dynamically
+ 
+adapt
+ 
+study
+ 
+plan.
+ 
+ 
+ 
+7.
+ 
+Execution
+ 
+Roadmap
+ 
+●
+ 
+Phase
+ 
+1
+:
+ 
+FastAPI
+ 
+setup,
+ 
+PKM
+ 
+event
+ 
+logging,
+ 
+DB
+ 
+schema
+ 
+ 
+●
+ 
+Phase
+ 
+2
+:
+ 
+Bayesian
+ 
+graph
+ 
++
+ 
+Bloom
+ 
+tags
+ 
+integration,
+ 
+connect
+ 
+frontend
+ 
+graph
+ 
+visualization
+ 
+ 
+●
+ 
+Phase
+ 
+3
+:
+ 
+LSTM
+ 
+memory
+ 
++
+ 
+DKT
+ 
+pipelines;
+ 
+model
+ 
+deployment;
+ 
+evaluation
+ 
+on
+ 
+last
+ 
+30
+ 
+yr
+ 
+PYQ
+ 
+ 
+●
+ 
+Phase
+ 
+4
+:
+ 
+Tutor
+ 
+Engine
+ 
+development,
+ 
+WebSocket
+ 
+feedback,
+ 
+dashboard
+ 
+integration,
+ 
+beta
+ 
+test
+ 
+ 
+●
+ 
+Post-Launch
+:
+ 
+Model
+ 
+fine-tuning
+ 
+(weekly
+ 
+for
+ 
+DKT,
+ 
+monthly
+ 
+for
+ 
+Bayesian
+ 
+CPT,
+ 
+RL
+ 
+for
+ 
+tutor
+ 
+accuracy) 
+ 
+ 
+ 
+ 
+ 
+ 
+8.
+ 
+Fine-tuning
+ 
+&
+ 
+Maintenance
+ 
+●
+ 
+Weekly
+ 
+retraining
+ 
+of
+ 
+DKT/LSTM
+ 
+on
+ 
+new
+ 
+user
+ 
+logs
+ 
+ 
+●
+ 
+Monthly
+ 
+recalibration
+ 
+of
+ 
+Bayesian
+ 
+conditional
+ 
+probabilities
+ 
+ 
+●
+ 
+Tutor
+ 
+Engine
+ 
+reinforcement
+ 
+learning—accuracy
+ 
+and
+ 
+learner
+ 
+outcomes
+ 
+logged
+ 
+for
+ 
+feedback
+ 
+loop
+ 
+ 
+ 
+9.
+ 
+KPIs
+ 
+/
+ 
+Success
+ 
+Metrics
+ 
+●
+ 
+Learning
+ 
+Outcome
+ 
+Improvement
+:
+ 
+Target
+ 
+≥30%
+ 
+improvement
+ 
+in
+ 
+assessment
+ 
+scores
+ 
+(benchmarked
+ 
+against
+ 
+baseline)
+ 
+ 
+●
+ 
+Bloom
+ 
+Level
+ 
+Progression
+:
+ 
+≥80%
+ 
+of
+ 
+active
+ 
+users
+ 
+show
+ 
+progression
+ 
+across
+ 
+minimum
+ 
+three
+ 
+Bloom
+ 
+levels
+ 
+per
+ 
+module
+ 
+within
+ 
+8
+ 
+weeks
+ 
+ 
+●
+ 
+Personalization
+ 
+Accuracy
+:
+ 
+Tutor
+ 
+suggestions
+ 
+achieve
+ 
+≥85%
+ 
+acceptance/engagement
+ 
+rate
+ 
+ 
+●
+ 
+Mastery
+ 
+Visualization
+:
+ 
+≥95%
+ 
+of
+ 
+concepts
+ 
+properly
+ 
+mapped
+ 
+and
+ 
+visualized
+ 
+per
+ 
+user
+ 
+ 
+●
+ 
+Retention
+ 
+Decay
+ 
+Prediction
+:
+ 
+≥90%
+ 
+accurate
+ 
+prediction
+ 
+(validated
+ 
+by
+ 
+assessment
+ 
+revisit)
+ 
+ 
+●
+ 
+Realtime
+ 
+Feedback
+ 
+Latency
+:
+ 
+≤2
+ 
+seconds
+ 
+for
+ 
+tutor
+ 
+nudges
+ 
+after
+ 
+PKM
+ 
+action
+ 
+ 
+●
+ 
+PYQ
+ 
+Benchmark
+ 
+Coverage
+:
+ 
+≥95%
+ 
+PYQ-concept
+ 
+mapping
+ 
+accuracy
+ 
+in
+ 
+the
+ 
+question
+ 
+banks
+ 
+ 
+●
+ 
+Usage
+ 
+Metrics
+:
+ 
+≥70%
+ 
+DAU/WAU
+ 
+ratio
+ 
+post-launch
+ 
+for
+ 
+target
+ 
+UPSC
+ 
+aspirant
+ 
+cohort
+ 
+ 
+ 
+ 
+ 
+10.
+ 
+Deliverables
+ 
+●
+ 
+Complete
+ 
+microservices
+ 
+backend
+ 
+(API,
+ 
+DKT,
+ 
+LSTM,
+ 
+Bayesian,
+ 
+Tutor)
+ 
+ 
+●
+ 
+Frontend
+ 
+dashboard
+ 
+with
+ 
+PKM
+ 
+workspace,
+ 
+drag-drop
+ 
+study
+ 
+path,
+ 
+graph,
+ 
+assessment,
+ 
+and
+ 
+tutor
+ 
+panel
+ 
+ 
+●
+ 
+Live
+ 
+Bloom-dashboard,
+ 
+mastery
+ 
+visualization,
+ 
+and
+ 
+semantic
+ 
+explorer
+ 
+ 
+●
+ 
+Documentation
+ 
+for
+ 
+API,
+ 
+model
+ 
+integration,
+ 
+usage,
+ 
+and
+ 
+onboarding
+ 
+flows
+ 
+ 
+●
+ 
+KPI
+ 
+analytics
+ 
+and
+ 
+dashboard
+ 
+monitoring
+ 
+toolkit
+ 
+ 
+ 
+11.
+ 
+Final
+ 
+Note
+ 
+By
+ 
+merging
+ 
+PKM,
+ 
+DKT,
+ 
+Bayesian
+ 
+modeling,
+ 
+and
+ 
+intuitive
+ 
+UX,
+ 
+this
+ 
+project
+ 
+establishes
+ 
+a
+ 
+cognitive
+ 
+twin
+ 
+for
+ 
+each
+ 
+aspirant—transforming
+ 
+their
+ 
+UPSC
+ 
+GS
+ 
+prep
+ 
+into
+ 
+a
+ 
+visible,
+ 
+adaptive,
+ 
+and
+ 
+AI-powered
+ 
+learning
+ 
+journey,
+ 
+tightly
+ 
+coupled
+ 
+to
+ 
+exam
+ 
+demands
+ 
+and
+ 
+personal
+ 
+goals.
+ 
+
+
+ITS · PKM · DKT — Final Architecture  1. Purpose:  Define a production-grade, privacy-aware, and scalable architecture for a Personal-Knowledge-Management-integrated Intelligent Tutoring System (ITS) with Deep Knowledge Tracing (DKT), hybrid KG-RAG retrieval, tool-using LLM tutor, long-term memory, and full observability.  2. Design Objectives • Grounded intelligence: Every tutor answer is backed by sources (notes/textbooks) and concept graph paths. • Personalization by evidence: Fuse DKT, LSTM memory/retention, and Bayesian Knowledge Graph (BNKG). • Agentic reasoning, safely: LLM can use tools (SQL/Neo4j/Vector/Python) through a secure gateway. • Cloud-scale + cost-aware: Autoscale microservices; route to the cheapest viable model per task SLA. • Security by default: Tenant/course/user isolation, PII redaction before cloud, audit trails.  3. Layered Architecture 3.1 Experience Layer • Tutor Chat UI: Streaming responses, citations panel, step-trace view, tool-use badges. • PKM Canvas: Note editor, link graph (Cytoscape), concept tagging, mastery overlay. • Dashboards: Bloom progression, mastery heatmaps, review schedule, cohort analytics. 3.2 Orchestration & Reasoning Layer • Tutor Orchestrator (FastAPI): Prompt assembler (state + context + policy), session/state, WS streaming. • Model Router: Policy-based selection (privacy, cost, latency, difficulty) → Cloud (Claude/Kimi-K2) or Local (Zamba/Ollama). • MCP Tool Gateway: Typed tools: sql.query, graph.query, vector.search, python.exec (sandboxed). 
+• Trace Store: Compressed reasoning summaries + tool I/O + citations for audit/explainability. 3.3 Knowledge & Retrieval Layer • BNKG (Neo4j): Concepts, prerequisites, Bloom tags; CPT params; mastery properties. • Vector Retrieval: Nomic embeddings → Milvus; metadata filters (tenant/course/user/topic). • Hybrid KG-RAG (LlamaIndex): Graph paths + vector chunks merged with provenance for the LLM. 3.4 Learning Models Layer • DKT Service: Predict per-concept mastery from interaction sequences. • Memory Service: Retention/decay scoring; spaced-repetition recommendations. • Policy Engine: Difficulty/pace/hinting decisions from DKT + Memory + BNKG. • BiDKT Variants: o Bayesian-Integrated DKT (BiDKT, default online): Use DKT as an emission model (Pr(correct | state, item)) calibrated via Platt/Isotonic; combine with BNKG priors and prerequisite constraints. Inference: online filtering with Bayesian update; Training: periodic EM-style CPT refresh using logged sequences. Why: better interpretability and stability under sparse labels; propagates mastery to related concepts via graph. o Bidirectional DKT (BiLSTM-DKT, offline analytics): BiLSTM over full sequences to learn richer temporal features (uses past+future within a batch). Use: item difficulty calibration, cold-start parameterization, and hint policy tuning; not used for real-time since future tokens aren’t available. o APIs: /dkt/infer (online RNN), /bidkt/offline_train (batch), /bnkg/cpt_update (monthly EM). 3.5 Data & Ingestion Layer • PKM Ingest: Files/notes/links; optional Whisper ASR; OCR; metadata; PII redaction. • ETL/Feature Builder: Event → features (concept, Bloom, recency, correctness) for models. • Storage: PostgreSQL (events/users), MinIO (artifacts), Redis (hot cache), S3 lifecycle policies. 3.6 Platform & Ops Layer • Observability: OTLP exporters in every service; unified dashboards; golden-set eval runner. • Automation: n8n jobs — nightly re-index, weekly eval reports, monthly BN CPT recalibration, backup/restore tests. 
+• Security: OIDC, RBAC/ABAC, secrets mgmt, WAF, egress control, data-at-rest encryption.  4. Data Flow (Text Diagram) User → Tutor UI ──
+▶ FastAPI Orchestrator ──
+▶ Model Router ──
+▶ LLM (Cloud/Local)            │                 │                    │            │                 │                    └─
+▶ MCP Tools (SQL/Neo4j/Vector/Python)            │                 │                               │            │                 │                               ├─
+▶ Neo4j (BNKG)            │                 │                               ├─
+▶ Milvus (semantic chunks)            │                 │                               └─
+▶ Python Sandbox (verify/calc)            │                 └─
+▶ Hybrid KG-RAG (LlamaIndex: graph+vector merge)            │                               └─
+▶ Sources + node set + citations            │ PKM Ingest ─
+▶ Preprocess/Redact ─
+▶ Embeddings ─
+▶ Milvus             └
+▶ ETL/BN sync ─
+▶ Neo4j (CPT updates via EM)  Events (answers/quizzes) ─
+▶ DKT + Memory ─
+▶ BNKG update ─
+▶ Policy Engine                                           │                                           └─
+▶ **Action Layer** (Planner + Bandit + Scheduler)                                                    │                                                    ├─
+▶ In-app Tutor UI actions (nudges, tasks)                                                    ├─
+▶ Notifications (email/Matrix)                                                    └─
+▶ Teacher Console (HITL escalation)                                                     Outcome Logger (exposure, reward) ─
+▶ Evaluator/Telemetry ─
+▶ Model & Policy updates  
+5. Component Blueprints & Rationale 5.1 FastAPI Gateway • Responsibilities: AuthN/Z, REST/WS APIs, request fan-out, response streaming, rate limits. • Why: Python ecosystem, async support, simple OpenAPI; pairs well with PyTorch, Neo4j drivers, LlamaIndex. 5.2 Tutor Orchestrator • Responsibilities: Prompt assembly (state + retrieved context + safety), tool policy, retries, response collation. • Why: Keeps LLM prompts lean, consistent; enforces tool-use rules; central place for pedagogy policies. 5.3 Model Router • Responsibilities: Route per policy (data sensitivity, latency, difficulty, cost); caching; fallbacks. • Why: Cut token spend, respect privacy; use strong MoE (Kimi/Claude) only when needed; local Zamba for drafts. 5.4 MCP Tool Gateway • Responsibilities: Safe, typed access to sql, graph, vector, python. • Why: Extensible, standard interface; auditable tool calls; easy to add calculators/simulators later. 5.5 BNKG (Neo4j + pgmpy) • Responsibilities: Concept graph with Bloom tags; CPT updates; mastery overlays. • Why: Explainable pathways and prerequisite logic; Bayesian smoothing of noisy evidence. 5.6 Vector Retrieval (Nomic + Milvus + LlamaIndex) • Responsibilities: Semantic memory of notes/content; hybrid graph+vector queries with provenance. • Why: Grounded answers, personal notes reuse, low hallucination; Milvus gives prod-grade scale & speed. 5.7 DKT & Memory Services (PyTorch) • Responsibilities: Mastery probabilities (DKT), retention/decay (LSTM); export signals to Policy. • Why: Evidence-based personalization; schedule spaced reviews; accelerate weak-topic recovery. 
+5.8 Long-term App Memory (Mem0) • Responsibilities: Persist learner/tutor facts (preferences, pitfalls, goals); TTL/policy. • Why: Reduce prompt size; continuity across weeks; deeper personalization. 5.9 Storage & Streams • PostgreSQL: Events, users, attempts; ACID. • MinIO/S3: Artifacts (docs/audio/models) with lifecycle. • Redis/Kafka: Caching + event pipelines; bursts smoothing. 5.10 Observability (OTLP) & n8n • Responsibilities: Metrics/traces/logs, eval pipelines, drift alerts; automation for re-index/retrain/report. • Why: Predictable SLOs, lower MTTR, self-healing. 5.11 Security & Privacy • Responsibilities: OIDC SSO, RBAC/ABAC, PII redaction, KMS encryption, WAF, audit trails, isolation. • Why: Educational PII compliance, safe tool-use, tenant boundaries.  6. Key Schemas & Contracts (Essentials) • BNKG Node {node_id, label, bloom_level, prereq_ids[], outcomes[], sources[]} • Edge {from, to, type:[prereq|related|part_of|refutes], weight} • Vector Chunk {chunk_id, doc_id, tenant, course, user?, uri, text, emb, tags[], hash} • Interaction Event {user, ts, node_ids[], q_id?, action, result, latency, tool_calls[]} • Memory Record {user, scope:[global|course], key, value, ttl, last_used} • Trace Summary {turn_id, tools[], citations[], safety_flags[], cost, tokens}  7. Public APIs (Representative) • POST /events/log → {status} (persist + enqueue features) • GET /graph/state?user=... → nodes/edges + mastery overlay • POST /search {q, scope, top_k} → chunks + citations 
+• POST /tutor/query {prompt, scope, policy} → answer + steps + citations (streamed) • POST /dkt/infer {seq} → {concept: p_mastery} • GET /dashboard/bloom?user=... → Bloom progression snapshot • Action Layer: o POST /actions/plan {user, context} → ranked actions [ {action_id, type, score, rationale, channel, schedule} ] o POST /actions/commit {action_id} → logs exposure + triggers delivery/schedule o POST /actions/feedback {action_id, outcome:{clicked?, completed?, score_delta}} → reward log o GET /actions/policy → bandit/exploration stats, safety caps 8. Deployment Topology Deployment Topology • Kubernetes: namespaces by env (dev/stage/prod); HPA autoscaling; PodSecurity; NetworkPolicies. • Data plane: Private subnets (Neo4j, Milvus, Postgres); Bastion for admin; WAF at edge; API Gateway/CDN. • Models: GPU node pool for LLM/DKT; local Ollama runners for Zamba; cloud APIs for Claude/Kimi via VPC egress. • CI/CD: GitHub Actions → Docker build → Helm deploy; Blue-Green/Canary; SAST/DAST; SBOM, image signing. • Backups/DR: Snapshots for Postgres/Neo4j/Milvus; MinIO versioning; restore drills.  9. Observability & Quality Gates • Metrics: grounding rate, citation coverage, tool-use %, hallucination flags, p95 latency, tokens/cost. • Evals: golden questions per course; rubric scoring; monthly BN CPT drift check. • Alerts: grounding < 80%, hallucination > 5%, cost budget breach, CPT instability, queue lag. • n8n automations: re-indexing, retraining, report mails, rollback triggers.  10. Security & Compliance • OIDC SSO; RBAC (role) + ABAC (tenant/course/user); signed MCP tool manifests. • Encryption in transit (TLS 1.2+) and at rest (KMS); key rotation. • PII redaction before cloud LLM; DLP checks; immutable audit logs; right-to-erasure workflows. 
+ 11. Success Metrics (Target) • Learning: +20–30% weekly mastery lift on weak nodes; −25% time-to-mastery. • Quality: ≥85% grounded answers; ≥70% tool-verified math/logic; <5% hallucination flags. • Action Layer: ≥12–20% uplift vs. control on action CTR → completion; positive off-policy estimated reward; review adherence >85%; escalation latency < 10 min. • Ops/Cost: p95 tutor < 4s (warm cache); −20% token cost via router; MTTR < 15 min. 12. Risks & Mitigations • Model sprawl / cost creep → Router policies, budget alerts, golden evals. • Graph drift / CPT instability → Shadow runs + eval gate before promotion. • Privacy lapses → Default local inference for sensitive flows; strict egress; audit. • Content variance → Teacher review queue; rubric eval; provenance required.  13. Glossary (Quick) • BNKG: Bayesian Knowledge Graph (concept graph + probabilistic inference). • DKT: Deep Knowledge Tracing (LSTM predicting concept mastery). • KG-RAG: Hybrid retrieval that merges graph paths and vector similarity. • MCP: Model Context Protocol (standardized tool interface for LLMs). • Mem0: Long-term app memory store for LLM agents.  14. Action Layer (Decision → Intervention → Outcome)  Purpose: Convert predictions into measurable interventions. Components - Action Planner: Priority score P = w1·(knowledge_gap) + w2·(forget_risk) + w3·(pedagogical_value) − w4·(novelty_penalty) − w5·(cost); safety caps (daily limits, fatigue). - Bandit Sequencer: Contextual Thompson/LinUCB to pick among actions (review, practice, explanation, quiz, concept-map task, peer Q, escalate-to-teacher). Counterfactual logging for off-policy evaluation. - Scheduler & Delivery: Immediate (in-session) or scheduled via n8n; channels: in-app, email, Matrix; quiet-hours, batching. - HITL: Teacher review queue for escalations; acceptance/rejection logged to retrain policy. - Compliance & Guardrails: fairness constraints (per-cohort exposure), explanation requirement, audit trails. 
+Data Contracts - action_exposure{action_id, user, time, channel, props} - action_outcome{action_id, user, time, clicked?, completed?, mastery_delta} Why it helps: Turns insights into consistent, accountable action—closing the loop between analytics and learner outcomes while enabling A/B tests and continuous improvement.  
