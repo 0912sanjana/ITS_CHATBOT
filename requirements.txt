@@ -1,36 +1,30 @@
-# === Flask Backend ===
-flask==3.0.2
-flask-cors==4.0.0
-gunicorn==21.2.0
-python-dotenv==1.0.1
-gevent>=1.4
+# -------------------------------
+# Core Web Framework
+# -------------------------------
+flask                 # Backend API to handle RAG logic
+flask-cors            # Allows frontend (Streamlit) to call Flask API
+gunicorn              # Production WSGI server (needed for deployment)
 
-# === LangChain Core & Extensions ===
-langchain>=0.2.1
-langchain-core>=0.3.52,<0.4.0
-langchain-community>=0.2.1
-langchain-google-genai==2.1.4
-langchain-groq>=0.0.1
+# -------------------------------
+# Streamlit Frontend
+# -------------------------------
+streamlit             # UI framework for building the chatbot interface
+python-dotenv         # Loads environment variables from .env / secrets.toml
 
-# === Vector DBs & Embeddings ===
-chromadb>=0.4.22
-faiss-cpu
-sentence-transformers
+# -------------------------------
+# LangChain (RAG Orchestration)
+# -------------------------------
+langchain             # Core LangChain abstractions (chains, prompts, LLMs)
+langchain-community   # Community integrations (retrievers, loaders, utils)
+langchain-google-genai # Google Gemini + Embeddings support
+langchain-groq        # Groq LLaMA 3.1/3.3 fast inference support
 
-# === Other Utilities ===
-protobuf<4.0.0
-pyprojroot
+# -------------------------------
+# Vector Database (Embeddings)
+# -------------------------------
+chromadb              # Stores embeddings & performs semantic retrieval
 
-# === Optional Visualization (for demos/logs) ===
-matplotlib
-seaborn
-
-streamlit
-python-dotenv
-langchain
-langchain-community
-langchain-chroma
-langchain-google-genai
-langchain-groq
-chromadb
-google-generativeai
+# -------------------------------
+# LLM SDKs (Direct API calls)
+# -------------------------------
+google-generativeai   # Official Google Gemini SDK
