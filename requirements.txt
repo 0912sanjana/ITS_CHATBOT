@@ -1,30 +1,39 @@
-# -------------------------------
-# Core Web Framework
-# -------------------------------
-flask                 # Backend API to handle RAG logic
-flask-cors            # Allows frontend (Streamlit) to call Flask API
-gunicorn              # Production WSGI server (needed for deployment)
+# =====================================================
+# Core Web Framework (Backend API)
+# =====================================================
+flask                     # Backend API (if you want Flask mode)
+flask-cors                # Enable CORS for Streamlit frontend
+gunicorn                  # Production WSGI server (for deployment)
 
-# -------------------------------
-# Streamlit Frontend
-# -------------------------------
-streamlit             # UI framework for building the chatbot interface
-python-dotenv         # Loads environment variables from .env / secrets.toml
+# =====================================================
+# Streamlit Frontend (Chat UI)
+# =====================================================
+streamlit                 # Web UI for ITS RAG Chatbot
+python-dotenv             # Load .env or Streamlit Secrets
 
-# -------------------------------
-# LangChain (RAG Orchestration)
-# -------------------------------
-langchain             # Core LangChain abstractions (chains, prompts, LLMs)
-langchain-community   # Community integrations (retrievers, loaders, utils)
-langchain-google-genai # Google Gemini + Embeddings support
-langchain-groq        # Groq LLaMA 3.1/3.3 fast inference support
+# =====================================================
+# LangChain (RAG Core)
+# =====================================================
+langchain-core<0.3.0      # Avoids pydantic_v1 errors
+langchain-community        # All loaders, retrievers, utilities
+langchain-groq             # Groq LLaMA 3.1 / 3.3 high-speed LLM support
 
-# -------------------------------
-# Vector Database (Embeddings)
-# -------------------------------
-chromadb              # Stores embeddings & performs semantic retrieval
+# =====================================================
+# Google Gemini SDK (Official) — SAFE
+# (Replaces langchain-google-genai which breaks on Cloud)
+# =====================================================
+google-generativeai        # Official Gemini API client
 
-# -------------------------------
-# LLM SDKs (Direct API calls)
-# -------------------------------
-google-generativeai   # Official Google Gemini SDK
+# =====================================================
+# Embeddings + Vector Database
+# =====================================================
+sentence-transformers      # Local embedding model (MiniLM)
+chromadb                   # Vector DB for semantic search
+faiss-cpu                  # Optional FAISS support (local testing)
+
+# =====================================================
+# Utilities
+# =====================================================
+numpy                      # Math operations
+pandas                     # Data handling
+requests                   # API calls
