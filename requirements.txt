@@ -24,3 +24,13 @@ pyprojroot
 # === Optional Visualization (for demos/logs) ===
 matplotlib
 seaborn
+
+streamlit
+python-dotenv
+langchain
+langchain-community
+langchain-chroma
+langchain-google-genai
+langchain-groq
+chromadb
+google-generativeai
