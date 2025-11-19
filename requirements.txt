@@ -1,29 +1,18 @@
-# =====================================================
-# Core Web Framework (Optional Backend)
-# =====================================================
-flask                  # Optional backend support
-flask-cors             # Allow Streamlit ↔ Flask communication
-gunicorn               # Production WSGI server (optional)
+# Streamlit Frontend
+streamlit
+python-dotenv
 
-# =====================================================
-# Streamlit Frontend (Main UI)
-# =====================================================
-streamlit              # Frontend UI for ITS Chatbot
-python-dotenv          # Loads .env / Secrets.toml values
+# LangChain (COMPATIBLE VERSIONS)
+langchain-core==0.3.79
+langchain-community==0.3.27
+langchain-groq==0.3.8
 
-# =====================================================
-# LangChain (RAG + LLM Orchestration Layer)
-# =====================================================
-langchain-core==0.2.11     # Stable version for Streamlit Cloud
-langchain-community         # Tools, loaders, retrievers
-langchain-groq              # Groq LLaMA 3.x high-speed inference
+# Google Embeddings
+google-generativeai==0.7.2
 
-# =====================================================
-# LLM SDKs (Direct API Integrations)
-# =====================================================
-# google-generativeai        # OPTIONAL: For Gemini (commented to speed up build)
+# Vector DB
+chromadb==0.5.5
 
-# =====================================================
-# Utilities (Fast Embeddings / Math / Data)
-# =====================================================
-numpy                       # Vector math operatio
+# Utilities
+numpy==1.26.4
+pandas==2.2.2

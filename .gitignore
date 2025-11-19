@@ -1,1 +1,67 @@
+# =====================================
+# PYTHON CACHE / BUILD
+# =====================================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.pkl
+*.egg-info/
+build/
+dist/
+
+# =====================================
+# ENVIRONMENT / API KEYS (VERY IMPORTANT)
+# =====================================
 .env
+.env.*
+*.env
+
+# =====================================
+# VIRTUAL ENVIRONMENT
+# =====================================
+.venv/
+venv/
+ENV/
+
+# =====================================
+# EMBEDDINGS / VECTOR DB (Do NOT push)
+# =====================================
+vectordb/
+chroma_db/
+chromadb/
+*.faiss
+*.npz
+*.pkl
+
+# =====================================
+# INPUT TRANSCRIPTS (sensitive)
+# =====================================
+cleaned_transcript.txt
+cleaned_transcript_full.txt
+Strict_ITS_40_Page_File.txt
+Transcript_The_Dhamm.txt
+*.txt
+
+# =====================================
+# LOGS
+# =====================================
+*.log
+
+# =====================================
+# SYSTEM FILES
+# =====================================
+.DS_Store
+Thumbs.db
+
+# =====================================
+# IDE FILES
+# =====================================
+.vscode/
+.idea/
+
+# =====================================
+# FLASK INSTANCE / CACHE
+# =====================================
+instance/
