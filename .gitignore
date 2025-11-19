@@ -1,67 +1,59 @@
 # =====================================
-# PYTHON CACHE / BUILD
+# PYTHON CACHE / BUILD ARTIFACTS
 # =====================================
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.pdb
-*.pkl
-*.egg-info/
-build/
-dist/
-
-# =====================================
-# ENVIRONMENT / API KEYS (VERY IMPORTANT)
-# =====================================
-.env
-.env.*
-*.env
-
-# =====================================
-# VIRTUAL ENVIRONMENT
-# =====================================
-.venv/
-venv/
-ENV/
-
-# =====================================
-# EMBEDDINGS / VECTOR DB (Do NOT push)
-# =====================================
-vectordb/
-chroma_db/
-chromadb/
-*.faiss
-*.npz
-*.pkl
-
-# =====================================
-# INPUT TRANSCRIPTS (sensitive)
-# =====================================
-cleaned_transcript.txt
-cleaned_transcript_full.txt
-Strict_ITS_40_Page_File.txt
-Transcript_The_Dhamm.txt
-*.txt
-
-# =====================================
-# LOGS
-# =====================================
 *.log
 
 # =====================================
-# SYSTEM FILES
+# ENVIRONMENT VARIABLES / KEYS
+# (never upload secrets to GitHub)
 # =====================================
+.env
+*.env
+.env.*
 .DS_Store
 Thumbs.db
 
 # =====================================
-# IDE FILES
+# LOCAL VECTOR DATABASE FILES
+# (NOT allowed on Streamlit Cloud)
+# =====================================
+vectordb/
+chroma_db/
+*.sqlite
+*.sqlite3
+*.bin
+*.hnsw
+*.faiss
+*.pkl
+*.npz
+
+# =====================================
+# INPUT TRANSCRIPT (optional to ignore)
+# If you want transcript inside GitHub,
+# remove the next line.
+# =====================================
+cleaned_transcript.txt
+
+# =====================================
+# EDITOR / IDE CONFIG FILES
 # =====================================
 .vscode/
 .idea/
 
 # =====================================
-# FLASK INSTANCE / CACHE
+# DEPLOYMENT / OS GENERATED FILES
 # =====================================
-instance/
+*.swp
+*.tmp
+*.bak
+*.orig
+*~
+
+# =====================================
+# STREAMLIT INTERNAL FILES
+# =====================================
+.streamlit/

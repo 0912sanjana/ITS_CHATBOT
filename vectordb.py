@@ -1,35 +1,28 @@
-# FINAL FAST EMBEDDING BUILDER (NO HF MODELS)
 import os
-import chromadb
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from dotenv import load_dotenv
 
-TRANSCRIPT = "cleaned_transcript.txt"
+load_dotenv()
 
-client = chromadb.PersistentClient(path="./chroma_db")
+TRANSCRIPT_FILE = "cleaned_transcript.txt"
 
-try:
-    collection = client.get_collection("its_transcript")
-    client.delete_collection("its_transcript")
-except:
-    pass
+def load_chunks():
+    with open(TRANSCRIPT_FILE, "r", encoding="utf-8") as f:
+        text = f.read()
+    return text.split("\n\n")
 
-collection = client.create_collection("its_transcript")
+def build_vector_db():
+    print("🔄 Building FAISS in-memory vector DB (HuggingFace embeddings)...")
 
-chunks = []
+    chunks = load_chunks()
 
-with open(TRANSCRIPT, "r", encoding="utf-8") as f:
-    text = f.read()
-
-# Simple fast chunking
-for part in text.split("\n\n"):
-    cleaned = part.strip()
-    if len(cleaned) > 20:
-        chunks.append(cleaned)
-
-# Store chunks (no embeddings required!)
-for idx, c in enumerate(chunks):
-    collection.add(
-        ids=[f"doc_{idx}"],
-        documents=[c]
+    embedder = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-print("🔥 FAST VectorDB created with NO embeddings.")
+    vectordb = FAISS.from_texts(chunks, embedder)
+    print("✅ FAISS Vector DB ready.")
+    return vectordb
+
+db = build_vector_db()
