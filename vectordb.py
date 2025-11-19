@@ -1,14 +1,9 @@
-# vectordb.py (Streamlit Cloud safe version)
-
 import os
 from dotenv import load_dotenv
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
 
 load_dotenv()
-
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-EMBED_MODEL = "models/embedding-001"
 
 TRANSCRIPT_FILE = "cleaned_transcript.txt"
 
@@ -17,28 +12,17 @@ def load_chunks():
         text = f.read()
     return text.split("\n\n")
 
-
 def build_vector_db():
-    print("🔄 Building Chroma vector DB...")
+    print("🔄 Building FAISS in-memory vector DB...")
 
     chunks = load_chunks()
 
-    embedder = GoogleGenerativeAIEmbeddings(
-        model=EMBED_MODEL,
-        api_key=GOOGLE_API_KEY
+    embedder = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-    vectordb = Chroma.from_texts(
-        texts=chunks,
-        embedding=embedder,
-        collection_name="its_transcript",
-        persist_directory="./chroma_db"
-    )
-
-    vectordb.persist()
-    print("✅ Chroma DB ready.")
+    vectordb = FAISS.from_texts(chunks, embedder)
+    print("✅ FAISS Vector DB ready.")
     return vectordb
 
-
-# Build when imported
 db = build_vector_db()
